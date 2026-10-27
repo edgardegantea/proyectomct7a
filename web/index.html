@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32-C3 Super Mini - Panel de Control y Eventos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="title-container">
+                <span class="badge">ESP32-C3 Super Mini</span>
+                <h1>Panel de Eventos y Telemetría</h1>
+                <p class="subtitle">Monitoreo en tiempo real de eventos vía API REST</p>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator" id="connectionBadge">
+                    <span class="dot"></span>
+                    <span id="connectionText">Conectando a la API...</span>
+                </div>
+                <button class="btn-config" id="btnConfig" title="Configurar URL de la API">⚙️ Configurar API</button>
+            </div>
+        </header>
+
+        <!-- Barra informativa de la API activa -->
+        <div class="api-bar">
+            <span>Conectado a la API:</span>
+            <code id="currentApiDisplay">/api/eventos</code>
+        </div>
+
+        <section class="cards-grid">
+            <!-- Tarjeta Estado LED -->
+            <div class="card" id="ledCard">
+                <div class="card-header">
+                    <span class="card-icon">💡</span>
+                    <h3>Estado del LED (GPIO 8)</h3>
+                </div>
+                <div class="led-visual-container">
+                    <div class="led-bulb" id="ledBulb"></div>
+                    <span class="led-state-text" id="ledText">APAGADO</span>
+                </div>
+                <p class="card-footer" id="ledFooter">Sin eventos de LED aún</p>
+            </div>
+
+            <!-- Tarjeta Temperatura -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🌡️</span>
+                    <h3>Sensor de Temperatura</h3>
+                </div>
+                <div class="temp-container">
+                    <span class="temp-value" id="tempValue">--</span>
+                    <span class="temp-unit">°C</span>
+                </div>
+                <p class="card-footer" id="tempFooter">Sensor interno del silicio ESP32-C3</p>
+            </div>
+
+            <!-- Tarjeta Información de Red y Dispositivo -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📡</span>
+                    <h3>Dispositivo y Red</h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="label">IP del ESP32:</span>
+                        <span class="value" id="ipValue">No registrada</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Último evento:</span>
+                        <span class="value highlight" id="lastEventValue">Ninguno</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Actualizado:</span>
+                        <span class="value" id="lastUpdateValue">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Historial de Eventos -->
+        <section class="events-section">
+            <div class="section-header">
+                <h2>Historial de Eventos Recibidos</h2>
+                <span class="events-counter" id="eventsCount">0 eventos</span>
+            </div>
+            <div class="table-container">
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Dispositivo</th>
+                            <th>Evento</th>
+                            <th>Mensaje / Detalle</th>
+                            <th>Valor</th>
+                            <th>IP Origen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                        <tr class="empty-row">
+                            <td colspan="6">Esperando que el ESP32-C3 envíe eventos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para configurar la URL de la API -->
+    <div class="modal-overlay" id="configModal">
+        <div class="modal-card">
+            <h3>⚙️ Configuración del Endpoint API</h3>
+            <p class="modal-desc">
+                Define la URL base de la API según el entorno de despliegue (VPS con PHP, PythonAnywhere, o servidor local):
+            </p>
+            
+            <div class="preset-buttons">
+                <button type="button" class="btn-preset" data-url="/api/eventos">Local / PythonAnywhere (/api/eventos)</button>
+                <button type="button" class="btn-preset" data-url="/api/index.php">VPS con PHP (/api/index.php)</button>
+            </div>
+
+            <div class="input-group">
+                <label for="apiUrlInput">URL de la API:</label>
+                <input type="text" id="apiUrlInput" placeholder="Ej: https://tu_usuario.pythonanywhere.com/api/eventos o /api/index.php">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCancelConfig">Cancelar</button>
+                <button class="btn-primary" id="btnSaveConfig">Guardar y Reconectar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
